@@ -13,7 +13,7 @@ body {
 
 .container {
     max-width: 650px;
-    background-color: #ffffff;
+    background-color: #fff;
     margin: 30px auto;
     padding: 25px;
     border-radius: 8px;
@@ -53,7 +53,7 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #aae7ff;
+    border-color: #2563eb;
 }
 
 button {
@@ -67,21 +67,30 @@ button {
 }
 
 .btn-primary {
-    background-color: #00184d;
+    background-color: #2563eb;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #020074;
+    background-color: #1d4ed8;
+}
+
+.btn-warning {
+    background-color: #d97706 !important;
+    color: white !important;
+}
+
+.btn-warning:hover {
+    background-color: #b45309 !important;
 }
 
 .btn-danger {
-    background-color: #520000;
+    background-color: #dc2626;
     color: white;
 }
 
 .btn-danger:hover {
-    background-color: #9c0000;
+    background-color: #b91c1c;
 }
 
 .resumo-container {
@@ -89,7 +98,7 @@ button {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    padding-top: 15px;
+    padding-top: 10px;
     border-top: 2px solid #e2e8f0;
 }
 
@@ -104,14 +113,15 @@ table {
     margin-top: 10px;
 }
 
-th, td {
+th,
+td {
     border: 1px solid #cbd5e1;
     padding: 10px;
     text-align: center;
 }
 
 th {
-    background-color: #002574;
+    background-color: #2563eb;
     color: white;
 }
 
@@ -119,13 +129,27 @@ tbody tr:nth-child(even) {
     background-color: #f8fafc;
 }
 
-.btn-remover {
-    background-color: #24005e;
+.btn-editar {
+    background-color: #f59e0b;
     color: white;
     padding: 5px 10px;
     font-size: 12px;
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+.btn-editar:hover {
+    background-color: #d97706;
+}
+
+.btn-remover {
+    background-color: #ef4444;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 3px;
 }
 
 .btn-remover:hover {
-    background-color: #0e004d;
+    background-color: #dc2626;
 }
