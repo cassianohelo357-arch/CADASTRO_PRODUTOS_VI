@@ -24,7 +24,9 @@
 
             <div class="form-group">
                 <label for="nome">Nome do produto:</label>
-                <input type="text" id="nome" placeholder="Ex. Notebook" />
+                <!-- Adicionado list="sugestoes-produtos" para autocompletar -->
+                <input type="text" id="nome" placeholder="Ex. Notebook" list="sugestoes-produtos" />
+                <datalist id="sugestoes-produtos"></datalist>
             </div>
 
             <div class="form-group">
@@ -39,6 +41,12 @@
 
             <button type="submit" id="btn-acao-form" class="btn-primary">Adicionar Produto</button>
         </form>
+
+        <!-- Barra de Pesquisa no Estoque -->
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label for="input-busca">Pesquisar no Estoque:</label>
+            <input type="text" id="input-busca" placeholder="Digite para filtrar por nome..." />
+        </div>
 
         <!-- Cabeçalho de Ações e Resumo -->
         <div class="resumo-container">
