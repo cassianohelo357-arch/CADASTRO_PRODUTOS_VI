@@ -50,6 +50,10 @@ const btnLimparTabela = document.getElementById("limpar-tabela");
 const btnAcaoForm = document.getElementById("btn-acao-form");
 const mensagemErro = document.getElementById("mensagem-erro");
 
+// Elementos de Busca e Sugestão
+const inputBusca = document.getElementById("input-busca");
+const datalistSugestoes = document.getElementById("sugestoes-produtos");
+
 // Modais e Botões de UX
 const btnBootstrap = document.getElementById("btn-bootstrap");
 const modalBootstrap = document.getElementById("modal-bootstrap");
@@ -105,16 +109,36 @@ modalBsFechar.addEventListener("click", () => {
     modalBootstrap.style.display = "none";
 });
 
-// Renderizar Tabela e Resumo
-function renderizarTabela() {
+// Atualiza as opções do autocompletar (datalist)
+function atualizarDatalist() {
+    datalistSugestoes.innerHTML = "";
+    listaDeProdutos.forEach((produto) => {
+        const option = document.createElement("option");
+        option.value = produto.nome;
+        datalistSugestoes.appendChild(option);
+    });
+}
+
+// Renderizar Tabela, Resumo e Filtro de Pesquisa
+function renderizarTabela(filtro = "") {
     tabelaCorpo.innerHTML = "";
     let valorTotalGeral = 0;
 
-    if (listaDeProdutos.length === 0) {
+    // Filtra os produtos com base no texto digitado na barra de pesquisa
+    const produtosFiltrados = listaDeProdutos.filter((produto) =>
+        produto.nome.toLowerCase().includes(filtro.toLowerCase())
+    );
+
+    // Atualiza as sugestões do formulário sempre que renderiza
+    atualizarDatalist();
+
+    if (produtosFiltrados.length === 0) {
         mensagemVazia.style.display = "block";
     } else {
         mensagemVazia.style.display = "none";
-        listaDeProdutos.forEach((produto, index) => {
+        produtosFiltrados.forEach((produto) => {
+            // Obtém o índice real na lista completa para garantir edição/remoção correta
+            const indexReal = listaDeProdutos.indexOf(produto);
             const subtotal = produto.calcularSubtotal();
             valorTotalGeral += subtotal;
 
@@ -125,8 +149,8 @@ function renderizarTabela() {
                 <td>${produto.quantidade}</td>
                 <td>R$ ${subtotal.toFixed(2)}</td>
                 <td>
-                    <button class="btn-editar" onclick="prepararEdicao(${index})">Editar</button>
-                    <button class="btn-remover" onclick="solicitarRemocao(${index})">Remover</button>
+                    <button class="btn-editar" onclick="prepararEdicao(${indexReal})">Editar</button>
+                    <button class="btn-remover" onclick="solicitarRemocao(${indexReal})">Remover</button>
                 </td>
             `;
             tabelaCorpo.appendChild(tr);
@@ -135,6 +159,11 @@ function renderizarTabela() {
 
     totalEstoqueEl.textContent = `Total em Estoque: R$ ${valorTotalGeral.toFixed(2)}`;
 }
+
+// Evento de digitação na barra de busca
+inputBusca.addEventListener("input", (e) => {
+    renderizarTabela(e.target.value);
+});
 
 // Submissão do Formulário (Adição ou Edição)
 form.addEventListener("submit", (e) => {
@@ -169,7 +198,7 @@ form.addEventListener("submit", (e) => {
     }
 
     salvarNoLocalStorage();
-    renderizarTabela();
+    renderizarTabela(inputBusca.value); // Mantém o filtro atual após salvar
     form.reset();
 });
 
@@ -189,7 +218,7 @@ window.solicitarRemocao = function(index) {
     abrirModalConfirmacao("Tem certeza que deseja remover este produto do estoque?", () => {
         listaDeProdutos.splice(index, 1);
         salvarNoLocalStorage();
-        renderizarTabela();
+        renderizarTabela(inputBusca.value);
     });
 };
 
@@ -201,7 +230,7 @@ btnLimparTabela.addEventListener("click", () => {
     abrirModalConfirmacao("Atenção: Deseja realmente limpar todos os registros do estoque?", () => {
         listaDeProdutos.length = 0;
         salvarNoLocalStorage();
-        renderizarTabela();
+        renderizarTabela(inputBusca.value);
     });
 });
 
