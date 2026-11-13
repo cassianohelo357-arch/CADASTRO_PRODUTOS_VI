@@ -8,7 +8,6 @@ class Produto {
         this.quantidade = parseInt(quantidade);
     }
 
-    // Método que calcula o subtotal do produto
     calcularSubtotal() {
         return this.preco * this.quantidade;
     }
@@ -18,27 +17,18 @@ class Produto {
 // FASE 2: Gerenciamento de Estado (Memória e Edição)
 //
 const listaDeProdutos = [];
-
-// Estado auxiliar: null indica "Modo Inclusão", número indica "Modo Edição"
 let indiceEdicao = null;
+const CHAVE_STORAGE = "sistema_estoque_produtos_v5";
 
-// Chave para persistência no navegador
-const CHAVE_STORAGE = "sistema_estoque_produtos";
-
-//
-// FASE 2.1: Persistência com localStorage
-//
+// Persistência com localStorage
 function salvarNoLocalStorage() {
-    const listaEmTexto = JSON.stringify(listaDeProdutos);
-    localStorage.setItem(CHAVE_STORAGE, listaEmTexto);
+    localStorage.setItem(CHAVE_STORAGE, JSON.stringify(listaDeProdutos));
 }
 
 function carregarDoLocalStorage() {
     const dadosSalvos = localStorage.getItem(CHAVE_STORAGE);
-
     if (dadosSalvos) {
         const produtosObjetos = JSON.parse(dadosSalvos);
-
         produtosObjetos.forEach((prod) => {
             const produtoInstanciado = new Produto(prod.nome, prod.preco, prod.quantidade);
             listaDeProdutos.push(produtoInstanciado);
@@ -47,161 +37,174 @@ function carregarDoLocalStorage() {
 }
 
 //
-// FASE 3: Captura de Elementos do DOM
+// FASE 3: Captura de Elementos do DOM e Manipulação de Interface (UX)
 //
-const formProduto = document.getElementById("produto-form");
-const btnSubmit = formProduto.querySelector("button[type='submit']");
-const btnLimparTudo = document.getElementById("limpar-tabela");
+const form = document.getElementById("produto-form");
+const inputNome = document.getElementById("nome");
+const inputPreco = document.getElementById("preco");
+const inputQuantidade = document.getElementById("quantidade");
+const tabelaCorpo = document.getElementById("tabela-corpo");
+const mensagemVazia = document.getElementById("mensagem-vazia");
 const totalEstoqueEl = document.getElementById("total-estoque");
+const btnLimparTabela = document.getElementById("limpar-tabela");
+const btnAcaoForm = document.getElementById("btn-acao-form");
+const mensagemErro = document.getElementById("mensagem-erro");
 
-//
-// FASE 4: Função para Transferir Estado para Modo Edição
-//
-function prepararEdicao(index) {
-    const produto = listaDeProdutos[index];
+// Modais e Botões de UX
+const btnBootstrap = document.getElementById("btn-bootstrap");
+const modalBootstrap = document.getElementById("modal-bootstrap");
+const modalBsFechar = document.getElementById("modal-bs-fechar");
 
-    // 1. Preenche os campos do formulário com os dados do registro selecionado
-    document.getElementById("nome").value = produto.nome;
-    document.getElementById("preco").value = produto.preco;
-    document.getElementById("quantidade").value = produto.quantidade;
+const modalConfirmacao = document.getElementById("modal-confirmacao");
+const modalTexto = document.getElementById("modal-texto");
+const modalBtnConfirmar = document.getElementById("modal-btn-confirmar");
+const modalBtnCancelar = document.getElementById("modal-btn-cancelar");
 
-    // 2. Atualiza a variável global de controle e altera o texto do botão
-    indiceEdicao = index;
-    btnSubmit.textContent = "Salvar Alterações";
-    btnSubmit.classList.add("btn-warning");
+let acaoPendenteModal = null;
+
+// Exibir mensagem inline (substitui alert)
+function mostrarErro(mensagem) {
+    mensagemErro.textContent = mensagem;
+    mensagemErro.style.display = "block";
 }
 
-//
-// FASE 5: Escuta de Eventos
-//
+function limparErro() {
+    mensagemErro.textContent = "";
+    mensagemErro.style.display = "none";
+}
 
-// 1. Evento Submit do Formulário com Validações (Guard Clauses) e Fluxo Update
-formProduto.addEventListener("submit", function (event) {
-    event.preventDefault();
+// Abrir Modal de Confirmação personalizado
+function abrirModalConfirmacao(texto, callback) {
+    modalTexto.textContent = texto;
+    modalConfirmacao.style.display = "flex";
+    acaoPendenteModal = callback;
+}
 
-    // Sanitização e Captura dos Valores
-    const nome = document.getElementById("nome").value.trim();
-    const preco = parseFloat(document.getElementById("preco").value);
-    const quantidade = parseInt(document.getElementById("quantidade").value);
+function fecharModalConfirmacao() {
+    modalConfirmacao.style.display = "none";
+    acaoPendenteModal = null;
+}
 
-    // Guard Clause 1: Validação do nome
-    if (!nome) {
-        alert("Por favor, informe um nome válido para o produto.");
+modalBtnConfirmar.addEventListener("click", () => {
+    if (acaoPendenteModal) {
+        acaoPendenteModal();
+    }
+    fecharModalConfirmacao();
+});
+
+modalBtnCancelar.addEventListener("click", () => {
+    fecharModalConfirmacao();
+});
+
+// Modal Bootstrap
+btnBootstrap.addEventListener("click", () => {
+    modalBootstrap.style.display = "flex";
+});
+
+modalBsFechar.addEventListener("click", () => {
+    modalBootstrap.style.display = "none";
+});
+
+// Renderizar Tabela e Resumo
+function renderizarTabela() {
+    tabelaCorpo.innerHTML = "";
+    let valorTotalGeral = 0;
+
+    if (listaDeProdutos.length === 0) {
+        mensagemVazia.style.display = "block";
+    } else {
+        mensagemVazia.style.display = "none";
+        listaDeProdutos.forEach((produto, index) => {
+            const subtotal = produto.calcularSubtotal();
+            valorTotalGeral += subtotal;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${produto.nome}</td>
+                <td>R$ ${produto.preco.toFixed(2)}</td>
+                <td>${produto.quantidade}</td>
+                <td>R$ ${subtotal.toFixed(2)}</td>
+                <td>
+                    <button class="btn-editar" onclick="prepararEdicao(${index})">Editar</button>
+                    <button class="btn-remover" onclick="solicitarRemocao(${index})">Remover</button>
+                </td>
+            `;
+            tabelaCorpo.appendChild(tr);
+        });
+    }
+
+    totalEstoqueEl.textContent = `Total em Estoque: R$ ${valorTotalGeral.toFixed(2)}`;
+}
+
+// Submissão do Formulário (Adição ou Edição)
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    limparErro();
+
+    const nome = inputNome.value.trim();
+    const preco = inputPreco.value;
+    const quantidade = inputQuantidade.value;
+
+    if (!nome || !preco || !quantidade) {
+        mostrarErro("Preencha todos os campos do formulário antes de continuar.");
         return;
     }
 
-    // Guard Clause 2: Checagem de Limites Numéricos
-    if (isNaN(preco) || preco <= 0 || isNaN(quantidade) || quantidade <= 0) {
-        alert("O preço e a quantidade devem ser valores numéricos maiores que zero.");
+    if (parseFloat(preco) < 0 || parseInt(quantidade) < 0) {
+        mostrarErro("O preço e a quantidade não podem ser negativos.");
         return;
     }
 
-    // Instancia o novo produto com dados validados
-    const produtoValido = new Produto(nome, preco, quantidade);
-
-    // Lógica de Persistência em Memória: Inclusão vs. Alteração (Update)
     if (indiceEdicao === null) {
         // Modo Inclusão
-        listaDeProdutos.push(produtoValido);
+        const novoProduto = new Produto(nome, preco, quantidade);
+        listaDeProdutos.push(novoProduto);
     } else {
-        // Modo Edição (Update)
-        listaDeProdutos[indiceEdicao] = produtoValido;
-
-        // Restaura o estado original de cadastro
+        // Modo Edição
+        listaDeProdutos[indiceEdicao].nome = nome;
+        listaDeProdutos[indiceEdicao].preco = parseFloat(preco);
+        listaDeProdutos[indiceEdicao].quantidade = parseInt(quantidade);
         indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
+        btnAcaoForm.textContent = "Adicionar Produto";
     }
 
-    // Sincroniza com localStorage, limpa o formulário e atualiza a interface
     salvarNoLocalStorage();
-    formProduto.reset();
-    atualizarInterface();
+    renderizarTabela();
+    form.reset();
 });
 
-// 2. Limpar Toda a Tabela
-btnLimparTudo.addEventListener("click", function () {
+// Funções de Ação na Tabela
+window.prepararEdicao = function(index) {
+    limparErro();
+    const produto = listaDeProdutos[index];
+    inputNome.value = produto.nome;
+    inputPreco.value = produto.preco;
+    inputQuantidade.value = produto.quantidade;
+    indiceEdicao = index;
+    btnAcaoForm.textContent = "Salvar Alterações";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.solicitarRemocao = function(index) {
+    abrirModalConfirmacao("Tem certeza que deseja remover este produto do estoque?", () => {
+        listaDeProdutos.splice(index, 1);
+        salvarNoLocalStorage();
+        renderizarTabela();
+    });
+};
+
+btnLimparTabela.addEventListener("click", () => {
     if (listaDeProdutos.length === 0) {
-        alert("A tabela já está vazia!");
+        mostrarErro("O estoque já está vazio.");
         return;
     }
-
-    if (confirm("Tem certeza que deseja remover todos os produtos?")) {
+    abrirModalConfirmacao("Atenção: Deseja realmente limpar todos os registros do estoque?", () => {
         listaDeProdutos.length = 0;
-        localStorage.removeItem(CHAVE_STORAGE);
-
-        // Restaura estado se estivesse editando
-        indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
-
-        formProduto.reset();
-        atualizarInterface();
-    }
+        salvarNoLocalStorage();
+        renderizarTabela();
+    });
 });
 
-//
-// FASE 6: Funções de Atualização e Renderização da Interface
-//
-function removerProduto(index) {
-    listaDeProdutos.splice(index, 1);
-
-    // Caso o item excluído seja o que estava em edição, reseta o estado
-    if (indiceEdicao === index) {
-        indiceEdicao = null;
-        btnSubmit.textContent = "Adicionar Produto";
-        btnSubmit.classList.remove("btn-warning");
-        formProduto.reset();
-    }
-
-    salvarNoLocalStorage();
-    atualizarInterface();
-}
-
-function atualizarTotalEstoque() {
-    const total = listaDeProdutos.reduce((acc, produto) => {
-        return acc + produto.calcularSubtotal();
-    }, 0);
-
-    totalEstoqueEl.textContent = `Total em Estoque: R$ ${total.toFixed(2)}`;
-}
-
-function renderizarTabela() {
-    const tabelaBody = document.querySelector("#tabela-produtos tbody");
-    tabelaBody.innerHTML = "";
-
-    listaDeProdutos.forEach((produto, index) => {
-        const linha = document.createElement("tr");
-
-        linha.innerHTML = `
-            <td>${produto.nome}</td>
-            <td>R$ ${produto.preco.toFixed(2)}</td>
-            <td>${produto.quantidade}</td>
-            <td>R$ ${produto.calcularSubtotal().toFixed(2)}</td>
-            <td>
-                <button class="btn-editar">Editar</button>
-                <button class="btn-remover">Remover</button>
-            </td>
-        `;
-
-        // Eventos dos botões da coluna de ações
-        const btnEditar = linha.querySelector(".btn-editar");
-        btnEditar.addEventListener("click", () => prepararEdicao(index));
-
-        const btnRemover = linha.querySelector(".btn-remover");
-        btnRemover.addEventListener("click", () => removerProduto(index));
-
-        tabelaBody.appendChild(linha);
-    });
-}
-
-function atualizarInterface() {
-    renderizarTabela();
-    atualizarTotalEstoque();
-}
-
-//
-// FASE 7: Inicialização da Aplicação
-//
+// Inicialização ao carregar a página
 carregarDoLocalStorage();
-atualizarInterface();
+renderizarTabela();
