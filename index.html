@@ -4,16 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Estoque - POO & CRUD</title>
+    <title>Sistema de Estoque - POO & CRUD (V5)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>Cadastro de Produtos</h1>
+        <h1>Cadastro de Produtos - V5</h1>
+
+        <!-- Botão Conceito Bootstrap -->
+        <div class="topo-acoes">
+            <button id="btn-bootstrap" class="btn-warning">Ver Conceito Bootstrap</button>
+        </div>
 
         <!-- Formulário de Entrada -->
         <form id="produto-form">
+            <!-- Mensagem Inline (Substitui o alert) -->
+            <div id="mensagem-erro" class="mensagem-erro" style="display: none;"></div>
+
             <div class="form-group">
                 <label for="nome">Nome do produto:</label>
                 <input type="text" id="nome" placeholder="Ex. Notebook" />
@@ -29,7 +37,7 @@
                 <input type="number" id="quantidade" placeholder="Ex. 5" />
             </div>
 
-            <button type="submit" class="btn-primary">Adicionar Produto</button>
+            <button type="submit" id="btn-acao-form" class="btn-primary">Adicionar Produto</button>
         </form>
 
         <!-- Cabeçalho de Ações e Resumo -->
@@ -49,9 +57,49 @@
                     <th>Ações</th>
                 </tr>
             </thead>
-            <tbody>
-                <! </tbody>
+            <tbody id="tabela-corpo">
+                <!-- Injetado via JavaScript -->
+            </tbody>
         </table>
+
+        <div id="mensagem-vazia" class="mensagem-vazia" style="display: none;">
+            Nenhum produto cadastrado no estoque.
+        </div>
+
+        <!-- Rodapé com as fotos e nomes -->
+        <footer class="footer-autores">
+            <div class="autor-box">
+                <img src="foto2.jpeg" alt="Helo" class="autor-img">
+                <span class="autor-nome">Feito por Helo</span>
+            </div>
+            <div class="autor-box">
+                <img src="foto1.jpeg" alt="Endrio" class="autor-img">
+                <span class="autor-nome">Feito por Endrio</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal de Confirmação Customizado (Substitui o confirm) -->
+    <div id="modal-confirmacao" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirmação de Ação</h3>
+            <p id="modal-texto">Deseja realmente prosseguir com esta operação?</p>
+            <div class="modal-botoes">
+                <button id="modal-btn-cancelar" class="btn-danger">Cancelar</button>
+                <button id="modal-btn-confirmar" class="btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conceito Bootstrap -->
+    <div id="modal-bootstrap" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Conceito Bootstrap & UX</h3>
+            <p>O Bootstrap acelera o desenvolvimento de interfaces (UI) com componentes responsivos e padronizados. Na Versão 5, eliminamos diálogos bloqueantes nativos (`alert()` e `confirm()`) substituindo-os por mensagens inline e modais customizados, garantindo uma experiência de usuário (UX) fluida e moderna.</p>
+            <div class="modal-botoes">
+                <button id="modal-bs-fechar" class="btn-primary">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
