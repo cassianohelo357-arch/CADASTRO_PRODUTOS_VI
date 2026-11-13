@@ -1,3 +1,4 @@
+
 :root {
     --creme: #f6f1e5;
     --card: #fffdf8;
@@ -45,7 +46,7 @@ body {
 }
 
 h1 {
-    margin: -32px -32px 30px;
+    margin: -32px -32px 20px;
     padding: 34px 32px;
     text-align: center;
     font-size: 26px;
@@ -56,11 +57,28 @@ h1 {
     border-bottom: 4px solid var(--dourado);
 }
 
+.topo-acoes {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
 form {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-bottom: 28px;
+}
+
+/* Mensagem de erro */
+.mensagem-erro {
+    padding: 12px 16px;
+    background-color: var(--terracota-claro);
+    color: var(--terracota-escuro);
+    border: 1.5px solid var(--terracota);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .form-group {
@@ -160,18 +178,6 @@ button:active {
     color: var(--musgo-profundo);
 }
 
-.campo-pesquisa {
-    margin-bottom: 18px;
-}
-
-.campo-pesquisa input {
-    width: 100%;
-    padding-left: 44px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%234f6f52' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
-    background-repeat: no-repeat;
-    background-position: 15px center;
-}
-
 table {
     width: 100%;
     border-collapse: separate;
@@ -183,8 +189,7 @@ table {
     overflow: hidden;
 }
 
-th,
-td {
+th, td {
     padding: 14px 12px;
     text-align: center;
     border-bottom: 1px solid var(--borda);
@@ -225,10 +230,6 @@ tbody tr:last-child td {
 
 tbody tr:nth-child(even) {
     background-color: #fbf8f1;
-}
-
-tbody tr {
-    transition: background-color 0.15s;
 }
 
 tbody tr:hover {
@@ -273,49 +274,93 @@ tbody tr:hover {
     margin-top: 12px;
 }
 
-[hidden] {
-    display: none !important;
+/* Rodapé dos Autores */
+.footer-autores {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid var(--borda);
 }
 
-@media (max-width: 600px) {
-    body {
-        padding: 12px;
-    }
+.autor-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
 
-    .container {
-        padding: 20px 16px;
-        margin: 12px auto;
-        border-radius: 18px;
-    }
+/* Fotos dos autores */
+.autor-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center center;
+    border: 2px solid var(--musgo);
+    box-shadow: 0 4px 10px rgba(44, 64, 48, 0.15);
+}
 
-    h1 {
-        margin: -20px -16px 22px;
-        padding: 26px 16px;
-        font-size: 21px;
-    }
+/* Ajuste individual do enquadramento */
+.autor-box:nth-child(1) .autor-img {
+    object-position: center 15%;
+}
 
-    table {
-        font-size: 12px;
-    }
+.autor-box:nth-child(2) .autor-img {
+    object-position: center 35%;
+}
 
-    th,
-    td {
-        padding: 10px 5px;
-    }
+.autor-nome {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-    th {
-        font-size: 10px;
-        letter-spacing: 0.3px;
-    }
+/* Modais */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(44, 58, 46, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
 
-    .btn-editar,
-    .btn-remover {
-        padding: 5px 8px;
-        font-size: 11px;
-        margin: 2px;
-    }
+.modal-content {
+    background-color: var(--card);
+    padding: 28px;
+    border-radius: 18px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: var(--sombra);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 4px solid var(--musgo);
+}
 
-    .resumo-container {
-        flex-wrap: wrap;
-    }
+.modal-content h3 {
+    color: var(--musgo-profundo);
+    font-size: 18px;
+}
+
+.modal-content p {
+    font-size: 14px;
+    color: var(--texto);
+    line-height: 1.5;
+}
+
+.modal-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
 }
